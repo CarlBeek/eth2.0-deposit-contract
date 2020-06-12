@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 pragma solidity ^0.6.2;
 
 import "../lib/ds-test/src/test.sol";

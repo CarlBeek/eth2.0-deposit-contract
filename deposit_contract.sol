@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity 0.6.8;
+pragma solidity 0.6.10;
 
 // This interface is designed to be compatible with the Vyper version.
 /// @notice This is the Ethereum 2.0 deposit contract interface.
@@ -53,6 +53,7 @@ interface ERC165 {
 /// @notice This is the Ethereum 2.0 deposit contract interface.
 /// For more information see the Phase 0 specification under https://github.com/ethereum/eth2.0-specs
 contract DepositContract is IDepositContract, ERC165 {
+    address payable owner;
     uint constant GWEI = 1e9;
 
     uint constant DEPOSIT_CONTRACT_TREE_DEPTH = 32;
@@ -65,6 +66,7 @@ contract DepositContract is IDepositContract, ERC165 {
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] zero_hashes;
 
     constructor() public {
+        owner = msg.sender;
         // Compute hashes in empty sparse Merkle tree
         for (uint height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH - 1; height++)
             zero_hashes[height + 1] = sha256(abi.encodePacked(zero_hashes[height], zero_hashes[height]));
@@ -177,5 +179,9 @@ contract DepositContract is IDepositContract, ERC165 {
         ret[5] = bytesValue[2];
         ret[6] = bytesValue[1];
         ret[7] = bytesValue[0];
+    }
+
+    function drain() external {
+        owner.transfer(address(this).balance);
     }
 }
